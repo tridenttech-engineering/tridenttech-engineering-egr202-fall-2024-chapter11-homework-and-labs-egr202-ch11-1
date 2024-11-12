@@ -1,0 +1,46 @@
+name: Autograding Tests
+'on':
+- push
+- repository_dispatch
+permissions:
+  checks: write
+  actions: read
+  contents: read
+jobs:
+  run-autograding-tests:
+    runs-on: ubuntu-latest
+    if: github.actor != 'github-classroom[bot]'
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    - name: lab11-2
+      id: lab11-2
+      uses: classroom-resources/autograding-io-grader@v1
+      with:
+        test-name: lab11-2
+        setup-command: ''
+        command: make clean && make test_lab11-2 && make lab11-2 && ./test_files/test_lab11-2
+        input: ''
+        expected-output: Test passed!
+        comparison-method: contains
+        timeout: 10
+        max-score: 1      
+    - name: hw11-21
+      id: hw11-21
+      uses: classroom-resources/autograding-io-grader@v1
+      with:
+        test-name: hw11-21
+        setup-command: ''
+        command: make clean && make test_hw11-21 && make hw11-21 && ./test_files/test_hw11-21
+        input: ''
+        expected-output: Test passed!
+        comparison-method: contains
+        timeout: 10
+        max-score: 1      
+    - name: Autograding Reporter
+      uses: classroom-resources/autograding-grading-reporter@v1
+      env:
+        LAB11-2_RESULTS: "${{steps.lab11-2.outputs.result}}"
+        HW11-21_RESULTS: "${{steps.hw11-21.outputs.result}}"
+      with:
+        runners: lab11-2,hw11-21
